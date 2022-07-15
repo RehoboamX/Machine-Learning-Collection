@@ -28,11 +28,12 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 my_tensor = torch.tensor([[1, 2, 3], [4, 5, 6]], dtype=torch.float32,
                          device=device, requires_grad=True)
 
-print(my_tensor)
-print(my_tensor.dtype)
-print(my_tensor.device)
-print(my_tensor.shape)
-print(my_tensor.requires_grad)
+# tensor的一些属性
+print(f"Information about tensor: {my_tensor}")     # 打印tensor中的data，device和requires_grad
+print(f"Type of tensor: {my_tensor.dtype}")         # 打印tensor的数据类型，这里为float32
+print(f"Device tensor is on: {my_tensor.device}")   # 打印cpu或cuda （cuda后面的数字为gpu的序号）
+print(f"Shape of tensor: {my_tensor.shape}")        # 打印tensor的形状，这里为2x3
+print(f"Requires gradient: {my_tensor.requires_grad}")  # 返回True会被追溯梯度，称此种节点为叶子节点
 
 # 其他常用的Tensors初始化方法
 x = torch.empty(size=(3, 3))    # 返回一个未初始化的tensor（其值为0或接近0的极小值）
@@ -41,27 +42,27 @@ x = torch.rand((3, 3))          # 返回一个0~1的均匀分布（randn为正�
 x = torch.ones((3, 3))          # 全1张量
 x = torch.eye(5, 5)             # eye（I）：单位矩阵
 
-x = torch.arange(start=0, end=5, step=1)            # start和end是前闭后开的
-x = torch.linspace(start=0.1, end=1, steps=10)      # 返回在区间start和end上均匀间隔的step个点（闭区间）
+x = torch.arange(start=0, end=5, step=1)            # start和end是前闭后开的，输出[0, 1, 2, 3, 4]，也可以用torch.arange(5)
+x = torch.linspace(start=0.1, end=1, steps=10)      # 返回在区间start和end上均匀间隔的step个点（闭区间），输出[0.1, 0.2, ..., 1]
 x = torch.empty(size=(1, 5)).normal_(mean=0, std=1) # 初始化为均值mean，标准差为std的正态分布
 x = torch.empty(size=(1, 5)).uniform_(0, 1)         # 初始化为0~1的均匀分布
 x = torch.diag(torch.ones(3))                       # torch.diag取矩阵的对角线元素
 print(x)
 
 # 初始化和转化Tensors到其他数据类型的方法（int, float, double）
-tensor = torch.arange(4)    # [0, 1, 2, 3], int64
+tensor = torch.arange(4)    # [0, 1, 2, 3], 默认初始化为int64的数据类型
 print(tensor.bool())        # int64 --> bool
 print(tensor.short())       # int64 --> int32
-print(tensor.long())        # int64 --> int64
-print(tensor.half())        # int64 --> float16, commonly used on some certain GPUs
-print(tensor.float())       # int64 --> float32
+print(tensor.long())        # int64 --> int64 （常用）
+print(tensor.half())        # int64 --> float16, 在一些特定GPU上有时被用到
+print(tensor.float())       # int64 --> float32 （常用）
 print(tensor.double())      # int64 --> float64
 
 # Numpy Arrays 和 Tensors之间的互相转化
 import numpy as np
 np_array = np.zeros((5, 5))
 tensor = torch.from_numpy(np_array) # np array --> tensor
-np_array_back = tensor.numpy()      # tensor --> np array
+np_array_back = tensor.numpy()      # tensor --> np array， np_array_back应该和np_array一样（可能有数值上的四舍五入）
 
 
 # =============================================================================== #
@@ -71,51 +72,51 @@ np_array_back = tensor.numpy()      # tensor --> np array
 x = torch.tensor([1, 2, 3])
 y = torch.tensor([9, 8, 7])
 
-# 加法
+# -- 加法 --
 z1 = torch.empty(3)
 torch.add(x, y, out=z1) # 法1
 
 z2 = torch.add(x, y)    # 法2
-z = x + y               # 法3（最简单直接）
+z = x + y               # 推荐法3（最简单直接）
 
-# 减法
+# -- 减法 --
 z = x - y
 
-# 除法
+# -- 除法 --
 z = torch.true_divide(x, y) # 如果x和y形状相同，则做元素级别的除法
 
-# Inplace操作
+# -- Inplace操作 --
 t = torch.zeros(3)
 t.add_(x)   # 当函数后面接着_时表示函数为inplace操作，会在原始的t上改变，而不生成一个新的copy变量，提高运算效率
 t += x      # 同上（注：t = t + x 并非inplace操作，会生成一个copy）
 
-# 指数运算
+# -- 指数运算 --
 z = x.pow(2)    # 元素级别的指数操作
 z = x ** 2      # 同上
 
-# 比较运算
+# -- 比较运算 --
 z = x > 0   # 元素级别比较，输出布尔数据
 z = x < 0
 
-# 矩阵乘法
+# -- 矩阵乘法 --
 x1 = torch.rand((2, 5))
 x2 = torch.rand((5, 3))
 x3 = torch.mm(x1, x2)   # 2x3
-x3 = x1.mm(x2)
+x3 = x1.mm(x2)  # 同上
 
-# 矩阵的指数运算
+# -- 矩阵的指数运算 --
 matrix_exp = torch.rand(5, 5)
 matrix_exp.matrix_power(3)  # 对矩阵的指数操作，输入要为方阵
 
-# 元素级别乘法
+# -- 元素级别乘法 --
 z = x * y
 print(z)
 
-# 点乘（向量元素级别乘法再累加）
+# -- 点乘（向量元素级别乘法再累加） --
 z = torch.dot(x, y)
 print(z)
 
-# 批量矩阵乘法
+# -- 批量矩阵乘法 --
 batch = 32
 n = 10
 m = 20
@@ -125,7 +126,7 @@ tensor1 = torch.rand((batch, n, m))
 tensor2 = torch.rand((batch, m, p))
 out_bmm = torch.bmm(tensor1, tensor2) # torch.bmm做批量的矩阵乘法，输出shape（batch, n, p）
 
-# 广播机制
+# -- 广播机制 --
 x1 = torch.rand((5, 5))
 x2 = torch.rand((1, 5))
 
@@ -161,9 +162,9 @@ x = torch.rand((batch_size, features))
 
 print(x[0])     # 打印第一个样本的特征值，同x[0, :]
 
-print(x[:, 0])  # 打印所有样本的第一个特征值
+print(x[:, 0])  # 打印所有样本的第一个特征值，shape：[10]
 
-print(x[2, 0:10])   # 打印第三个样本的前十个特征值 （注： 0：10 --> [0, 1, 2, ..., 9]）
+print(x[2, 0:10])   # 打印第三个样本的前十个特征值，shape：[10] （注： 0：10 --> [0, 1, 2, ..., 9]）
 
 x[0, 0] = 100   # 对某特征值重新赋值
 
@@ -200,6 +201,7 @@ x_3x3 = x.view(3, 3)    # 法1 view只适合对满足连续性条件（contiguou
 x_3x3 = x.reshape(3, 3) # 法2 view能干的reshape都能干，如果view不能干就可以用reshape来处理。 详见https://www.jb51.net/article/236201.htm
 
 y = x_3x3.t()   # torch.t()表示取转置，转置后的张量则不满足连续性条件，
+print(y.is_contiguous())    # 会打印False，不能直接view操作，但可以reshape
 print(y.contiguous().view(9))   # 直接采用y.view操作会报错，此时应采用以上或用reshape操作来生成一个copy
 
 x1 = torch.rand((2, 5))
