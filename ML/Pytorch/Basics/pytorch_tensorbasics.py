@@ -12,6 +12,7 @@ between different types (int, float etc) and how to convert a tensor to an
 numpy array and vice-versa.
 
 Programmed by Aladdin Persson
+Translated by RehoboamX
 * 2022-07-13: Initial coding
 """
 
