@@ -8,8 +8,8 @@ check accuracy and more.
 Programmed by Aladdin Persson
 Translated by RehoboamX
 
-* 2020-07-17: Initial coding
-* 2021-07-17: More detailed comments and small revision of the code
+* 2022-07-17: Initial coding
+* 2022-07-17: More detailed comments and small revision of the code
 """
 
 # Imports导入即将被用到的包
