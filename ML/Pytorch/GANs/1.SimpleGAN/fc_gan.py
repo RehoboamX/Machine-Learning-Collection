@@ -59,7 +59,7 @@ dataset = datasets.MNIST(root="mnist_data/", transform=transforms, download=True
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 opt_disc = optim.Adam(disc.parameters(), lr=lr, betas=(0.4, 0.8), weight_decay=0.0001)
 opt_gen = optim.Adam(gen.parameters(), lr=lr, betas=(0.4, 0.8), weight_decay=0.0001)
-criterion = nn.BCELoss().to(device)
+criterion = nn.BCELoss()
 writer_fake = SummaryWriter(f"runs/GAN_MNIST/fake")
 writer_real = SummaryWriter(f"runs/GAN_MNIST/real")
 step = 0
@@ -69,7 +69,7 @@ for epoch in range(num_epochs):
         real = real.view(real.shape[0], -1).to(device)  # 将除了batch_size的其他维度展平
         batch_size = real.shape[0]
 
-        ### 训练判别器：最大化 log(D(real)) + log(1 - D(G(z))
+        # 训练判别器：最大化 log(D(real)) + log(1 - D(G(z))
         noise = torch.randn(batch_size, z_dim).to(device)
         fake = gen(noise)
         disc_real = disc(real).view(-1)  # 将判别器对训练样本的输出结果（batchsize*1）展平
@@ -81,7 +81,7 @@ for epoch in range(num_epochs):
         lossD.backward()    # 如果括号里加上 retain_graph=True 则上面无需使用detach()
         opt_disc.step()
 
-        ### 训练生成器：最小化 log(1 - D(G(z))  <--->  最大化 log(D(G(z)))，这样的话不容易梯度饱和
+        # 训练生成器：最小化 log(1 - D(G(z))  <--->  最大化 log(D(G(z)))，这样的话不容易梯度饱和
         output = disc(fake).view(-1)    # 重新构建计算图
         lossG = criterion(output, torch.ones_like(output))
         opt_gen.zero_grad()
