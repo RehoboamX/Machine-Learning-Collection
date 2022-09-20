@@ -34,7 +34,7 @@ WEIGHT_DECAY = 0  # 设置为0简化运算
 EPOCHS = 100
 NUM_WORKERS = 1
 PIN_MEMORY = True  # 计算机内存充足时或者load的dataset很小时设置
-LOAD_MODEL = True
+LOAD_MODEL = False
 LOAD_MODEL_FILE = "overfit.pth.tar"
 IMG_DIR = "data/images"
 LABEL_DIR = "data/labels"
@@ -113,15 +113,15 @@ def main():
     )
 
     for epoch in range(EPOCHS):
-        for x, y in train_loader:
-            x = x.to(DEVICE)
-            for idx in range(8):
-                bboxes = cellboxes_to_boxes(model(x))  # 将相对于cell的bboxes转化为相对于整个image的bboxes [BS x S*S x 6]
-                bboxes = non_max_suppression(bboxes[idx], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
-                plot_image(x[idx].permute(1, 2, 0).to("cpu"), bboxes)  # 要将tensor转换为ndarray的形式（只有cpu才能和ndarray互相转换）
+#         for x, y in train_loader:
+#             x = x.to(DEVICE)
+#             for idx in range(8):
+#                 bboxes = cellboxes_to_boxes(model(x))  # 将相对于cell的bboxes转化为相对于整个image的bboxes [BS x S*S x 6]
+#                 bboxes = non_max_suppression(bboxes[idx], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
+#                 plot_image(x[idx].permute(1, 2, 0).to("cpu"), bboxes)  # 要将tensor转换为ndarray的形式（只有cpu才能和ndarray互相转换）
 
-            import sys
-            sys.exit()  # 可视化后退出
+#             import sys
+#             sys.exit()  # 可视化后退出
 
         pred_boxes, target_boxes = get_bboxes(  # 返回经过NMS的列表[[train_idx, class_pred, prob_score, x1, y1, x2, y2], ...]
             train_loader, model, iou_threshold=0.5, threshold=0.4
@@ -133,14 +133,14 @@ def main():
 
         print(f"Train mAP: {mean_avg_prec}")  # 每轮训练前先计算mAP并打印
 
-        if mean_avg_prec > 0.9:
-            checkpoint = {
-                "state_dict": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-            }
-            save_checkpoint(checkpoint, filename=LOAD_MODEL_FILE)
-            import time
-            time.sleep(10)  # 防止重复保存，有时间退出
+#         if mean_avg_prec > 0.9:
+#             checkpoint = {
+#                 "state_dict": model.state_dict(),
+#                 "optimizer": optimizer.state_dict(),
+#             }
+#             save_checkpoint(checkpoint, filename=LOAD_MODEL_FILE)
+#             import time
+#             time.sleep(10)  # 防止重复保存，有时间退出
 
         train_fn(train_loader, model, optimizer, loss_fn)
 
